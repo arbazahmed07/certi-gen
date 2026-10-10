@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: certiflow-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://certiflow:certiflow_secret@postgres:5432/certiflow_db}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - STORAGE_TYPE=local
+    volumes:
+      - ./server/storage_data:/app/storage_data
+    depends_on:
+      - postgres
+      - redis
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: certiflow-celery-worker
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://certiflow:certiflow_secret@postgres:5432/certiflow_db}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - STORAGE_TYPE=local
+    volumes:
+      - ./server/storage_data:/app/storage_data
+    depends_on:
+      - postgres
+      - redis
+    command: celery -A app.tasks.celery_app.celery_app worker --loglevel=info --concurrency=4
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: certiflow-redis
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: certiflow-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: certiflow
+      POSTGRES_PASSWORD: certiflow_secret
+      POSTGRES_DB: certiflow_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
