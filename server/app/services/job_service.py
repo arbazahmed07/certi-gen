@@ -10,7 +10,6 @@ from app.repositories.job_repository import JobRepository
 from app.repositories.recipient_repository import RecipientRepository
 from app.services.validation_service import ValidationService
 from app.services.certificate_service import CertificateService
-from app.tasks.generation_tasks import process_job_task, prepare_archive_task, run_job_processing
 from app.core.errors import JobNotFoundError, InvalidJobStateError
 
 logger = logging.getLogger(__name__)
@@ -29,16 +28,19 @@ class JobService:
             return
 
         try:
+            from app.tasks.generation_tasks import process_job_task
             process_job_task.delay(job_id)
             logger.info(f"Dispatched Celery task for job {job_id}")
         except Exception as e:
             logger.warning(f"Could not reach Celery broker ({e}). Dispatching in background thread.")
+            from app.tasks.generation_tasks import run_job_processing
             worker_thread = threading.Thread(target=run_job_processing, args=(job_id,), daemon=True)
             worker_thread.start()
 
     @staticmethod
     def _dispatch_archive_task(job_id: str):
         try:
+            from app.tasks.generation_tasks import prepare_archive_task
             prepare_archive_task.delay(job_id)
             logger.info(f"Dispatched Celery archive task for job {job_id}")
         except Exception as e:

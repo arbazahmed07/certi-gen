@@ -4,7 +4,7 @@ pydantic>=2.8.0
 pydantic-settings>=2.4.0
 sqlalchemy>=2.0.30
 alembic>=1.13.0
-psycopg2-binary>=2.9.9; python_version < '3.14'
+# psycopg3 — works with Neon PostgreSQL (SSL) on Python 3.12
 psycopg[binary]>=3.2.0
 redis>=5.0.0
 celery>=5.4.0

@@ -262,6 +262,7 @@ export const GenerateCertificates: React.FC = () => {
               </label>
               <input
                 id="course_name_input"
+                type="text"
                 {...register('course_name')}
                 placeholder="e.g. Advanced Distributed Systems & Cloud Architecture"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -277,6 +278,7 @@ export const GenerateCertificates: React.FC = () => {
               </label>
               <input
                 id="organization_input"
+                type="text"
                 {...register('organization')}
                 placeholder="e.g. Global Technology Institute"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -292,6 +294,7 @@ export const GenerateCertificates: React.FC = () => {
               </label>
               <input
                 id="issuer_input"
+                type="text"
                 {...register('issuer')}
                 placeholder="e.g. Dr. Sarah Connor, Executive Dean"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -307,6 +310,7 @@ export const GenerateCertificates: React.FC = () => {
               </label>
               <input
                 id="issue_date_input"
+                type="text"
                 {...register('issue_date')}
                 placeholder="e.g. October 15, 2026"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -322,6 +326,7 @@ export const GenerateCertificates: React.FC = () => {
               </label>
               <input
                 id="event_name_input"
+                type="text"
                 {...register('event_name')}
                 placeholder="e.g. Annual Cloud Summit 2026"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"

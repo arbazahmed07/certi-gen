@@ -13,8 +13,8 @@ describe('GenerateCertificates Form Flow', () => {
     );
 
     expect(screen.getByText(/1\. Certificate Information/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Course \/ Certification Title \*/i, { selector: 'label' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Issuing Organization \*/i, { selector: 'label' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/e\.g\. Advanced Distributed Systems/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/e\.g\. Global Technology Institute/i)).toBeInTheDocument();
   });
 
   it('navigates to step 2 upon clicking Next Step', async () => {

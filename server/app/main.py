@@ -16,8 +16,16 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure database tables exist (also covered by Alembic)
-    Base.metadata.create_all(bind=engine)
+    # Ensure database tables exist (retry if Neon is waking up from idle)
+    import time
+    for attempt in range(5):
+        try:
+            Base.metadata.create_all(bind=engine)
+            break
+        except Exception as e:
+            if attempt == 4:
+                raise
+            time.sleep(2)
     # Ensure storage initialized
     get_storage()
     yield

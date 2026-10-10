@@ -1,61 +1,110 @@
-version: '3.8'
+# ─────────────────────────────────────────────────────────────────────────────
+# CertiFlow — Docker Compose
+#
+# Database : Neon PostgreSQL (external, cloud-hosted — no local Postgres needed)
+# Cache    : Redis (local container)
+# Backend  : FastAPI + Uvicorn
+# Worker   : Celery
+# Frontend : React + Vite (dev server)
+#
+# Usage:
+#   1. Copy .env.example → .env.docker and fill in your Neon DB URL.
+#   2. docker compose --env-file .env.docker up --build
+# ─────────────────────────────────────────────────────────────────────────────
 
 services:
+  # ── Redis (broker + result backend for Celery) ─────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: certiflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
   backend:
     build:
       context: ./server
       dockerfile: Dockerfile
     container_name: certiflow-backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
+    env_file:
+      - .env.docker
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://certiflow:certiflow_secret@postgres:5432/certiflow_db}
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - STORAGE_TYPE=local
+      # These override values in .env.docker for Docker-internal networking
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      STORAGE_TYPE: local
+      LOCAL_STORAGE_DIR: /app/storage_data
     volumes:
       - ./server/storage_data:/app/storage_data
+      - ./server/app:/app/app
     depends_on:
-      - postgres
-      - redis
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      redis:
+        condition: service_healthy
+    command: >
+      uvicorn app.main:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --log-level info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
+  # ── Celery Worker ───────────────────────────────────────────────────────────
   worker:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: certiflow-celery-worker
+    container_name: certiflow-worker
+    restart: unless-stopped
+    env_file:
+      - .env.docker
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://certiflow:certiflow_secret@postgres:5432/certiflow_db}
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - STORAGE_TYPE=local
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      STORAGE_TYPE: local
+      LOCAL_STORAGE_DIR: /app/storage_data
     volumes:
       - ./server/storage_data:/app/storage_data
+      - ./server/app:/app/app
     depends_on:
-      - postgres
-      - redis
-    command: celery -A app.tasks.celery_app.celery_app worker --loglevel=info --concurrency=4
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    command: >
+      celery -A app.tasks.celery_app.celery_app worker
+        --loglevel=info
+        --concurrency=4
 
-  redis:
-    image: redis:7.2-alpine
-    container_name: certiflow-redis
+  # ── React / Vite Frontend (dev) ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: certiflow-frontend
+    restart: unless-stopped
     ports:
-      - "6379:6379"
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: certiflow-postgres
-    ports:
-      - "5432:5432"
+      - "5173:5173"
     environment:
-      POSTGRES_USER: certiflow
-      POSTGRES_PASSWORD: certiflow_secret
-      POSTGRES_DB: certiflow_db
+      VITE_API_URL: http://backend:8000
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+      # Live-reload: mount source, but keep node_modules in the container
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend

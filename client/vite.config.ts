@@ -15,10 +15,13 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',   // Required for Docker
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // In Docker Compose, VITE_API_URL=http://backend:8000
+        // Locally, falls back to http://localhost:8000
+        target: process.env.VITE_API_URL ?? 'http://localhost:8000',
         changeOrigin: true,
       },
     },
