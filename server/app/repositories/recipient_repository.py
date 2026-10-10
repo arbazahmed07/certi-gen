@@ -1,6 +1,7 @@
-from typing import Optional, List, Tuple
-from sqlalchemy.orm import Session
+
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
 from app.models.recipient import RecipientCertificate, RecipientStatus, utcnow
 
 
@@ -8,24 +9,24 @@ class RecipientRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_id(self, recipient_id: str) -> Optional[RecipientCertificate]:
+    def get_by_id(self, recipient_id: str) -> RecipientCertificate | None:
         return self.db.query(RecipientCertificate).filter(RecipientCertificate.id == recipient_id).first()
 
-    def get_by_certificate_id(self, certificate_id: str) -> Optional[RecipientCertificate]:
+    def get_by_certificate_id(self, certificate_id: str) -> RecipientCertificate | None:
         return self.db.query(RecipientCertificate).filter(RecipientCertificate.certificate_id == certificate_id).first()
 
-    def bulk_insert(self, recipients: List[RecipientCertificate]) -> None:
+    def bulk_insert(self, recipients: list[RecipientCertificate]) -> None:
         self.db.bulk_save_objects(recipients)
         self.db.commit()
 
     def list_by_job(
         self,
         job_id: str,
-        status: Optional[RecipientStatus] = None,
-        search: Optional[str] = None,
+        status: RecipientStatus | None = None,
+        search: str | None = None,
         offset: int = 0,
         limit: int = 50
-    ) -> Tuple[List[RecipientCertificate], int]:
+    ) -> tuple[list[RecipientCertificate], int]:
         query = self.db.query(RecipientCertificate).filter(RecipientCertificate.job_id == job_id)
 
         if status:
@@ -45,10 +46,10 @@ class RecipientRepository:
 
     def list_all_certificates(
         self,
-        search: Optional[str] = None,
+        search: str | None = None,
         offset: int = 0,
         limit: int = 50
-    ) -> Tuple[List[RecipientCertificate], int]:
+    ) -> tuple[list[RecipientCertificate], int]:
         query = self.db.query(RecipientCertificate).filter(RecipientCertificate.status == RecipientStatus.SUCCESS)
 
         if search:
@@ -63,7 +64,7 @@ class RecipientRepository:
         items = query.order_by(desc(RecipientCertificate.generated_at)).offset(offset).limit(limit).all()
         return items, total
 
-    def get_pending_batch(self, job_id: str, limit: int = 50) -> List[RecipientCertificate]:
+    def get_pending_batch(self, job_id: str, limit: int = 50) -> list[RecipientCertificate]:
         return (
             self.db.query(RecipientCertificate)
             .filter(
@@ -98,7 +99,7 @@ class RecipientRepository:
             rec.error_message = reason
             self.db.commit()
 
-    def get_successful_recipients(self, job_id: str) -> List[RecipientCertificate]:
+    def get_successful_recipients(self, job_id: str) -> list[RecipientCertificate]:
         return (
             self.db.query(RecipientCertificate)
             .filter(
@@ -108,7 +109,7 @@ class RecipientRepository:
             .all()
         )
 
-    def get_failed_recipients(self, job_id: str) -> List[RecipientCertificate]:
+    def get_failed_recipients(self, job_id: str) -> list[RecipientCertificate]:
         return (
             self.db.query(RecipientCertificate)
             .filter(

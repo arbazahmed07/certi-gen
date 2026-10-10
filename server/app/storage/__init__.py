@@ -1,7 +1,7 @@
+from app.core.config import settings
 from app.storage.base import BaseStorage
 from app.storage.local import LocalStorage
 from app.storage.s3 import S3Storage
-from app.core.config import settings
 
 _storage_instance = None
 

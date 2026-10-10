@@ -1,15 +1,15 @@
+import logging
 import os
 from pathlib import Path
-from typing import Optional
-from app.storage.base import BaseStorage
+
 from app.core.config import settings
-import logging
+from app.storage.base import BaseStorage
 
 logger = logging.getLogger(__name__)
 
 
 class LocalStorage(BaseStorage):
-    def __init__(self, base_dir: Optional[str] = None):
+    def __init__(self, base_dir: str | None = None):
         self.base_dir = Path(base_dir or settings.LOCAL_STORAGE_DIR)
         self.base_dir.mkdir(parents=True, exist_ok=True)
 
@@ -26,7 +26,7 @@ class LocalStorage(BaseStorage):
         logger.debug(f"Saved {len(data)} bytes to {target_path}")
         return key
 
-    def get_bytes(self, key: str) -> Optional[bytes]:
+    def get_bytes(self, key: str) -> bytes | None:
         target_path = self._resolve_path(key)
         if not target_path.exists():
             return None
@@ -44,7 +44,7 @@ class LocalStorage(BaseStorage):
             return True
         return False
 
-    def get_file_path(self, key: str) -> Optional[str]:
+    def get_file_path(self, key: str) -> str | None:
         target_path = self._resolve_path(key)
         if target_path.exists():
             return str(target_path)

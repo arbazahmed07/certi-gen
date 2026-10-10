@@ -1,4 +1,5 @@
-from typing import Generic, TypeVar, List, Optional
+from typing import Generic, TypeVar
+
 from pydantic import BaseModel, Field
 
 T = TypeVar("T")
@@ -10,7 +11,7 @@ class PaginationParams(BaseModel):
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
-    items: List[T]
+    items: list[T]
     total: int
     page: int
     page_size: int
@@ -20,4 +21,4 @@ class PaginatedResponse(BaseModel, Generic[T]):
 class MessageResponse(BaseModel):
     message: str
     status: str = "success"
-    details: Optional[dict] = None
+    details: dict | None = None

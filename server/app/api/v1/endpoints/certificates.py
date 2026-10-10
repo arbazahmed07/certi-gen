@@ -1,26 +1,24 @@
 import io
 import math
-from typing import Optional
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.core.errors import CertificateNotFoundError
 from app.db.session import get_db
-from app.models.recipient import RecipientCertificate, RecipientStatus
-from app.models.job import GenerationJob
+from app.models.recipient import RecipientStatus
+from app.repositories.recipient_repository import RecipientRepository
 from app.schemas.certificate import CertificateResponse, CertificateVerifyResponse
 from app.schemas.common import PaginatedResponse
-from app.repositories.recipient_repository import RecipientRepository
-from app.repositories.job_repository import JobRepository
 from app.storage import get_storage
-from app.core.errors import CertificateNotFoundError
 
 router = APIRouter()
 
 
 @router.get("", response_model=PaginatedResponse[CertificateResponse])
 def list_certificates(
-    search: Optional[str] = None,
+    search: str | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db)

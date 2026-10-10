@@ -1,14 +1,15 @@
 import math
-from typing import Optional
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+
+from app.core.errors import JobNotFoundError
 from app.db.session import get_db
 from app.models.recipient import RecipientStatus
-from app.schemas.recipient import RecipientResponse
-from app.schemas.common import PaginatedResponse
 from app.repositories.job_repository import JobRepository
 from app.repositories.recipient_repository import RecipientRepository
-from app.core.errors import JobNotFoundError
+from app.schemas.common import PaginatedResponse
+from app.schemas.recipient import RecipientResponse
 
 router = APIRouter()
 
@@ -16,8 +17,8 @@ router = APIRouter()
 @router.get("/jobs/{job_id}/recipients", response_model=PaginatedResponse[RecipientResponse])
 def list_job_recipients(
     job_id: str,
-    status: Optional[RecipientStatus] = None,
-    search: Optional[str] = None,
+    status: RecipientStatus | None = None,
+    search: str | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db)

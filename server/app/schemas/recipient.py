@@ -1,12 +1,13 @@
-from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.models.recipient import RecipientStatus
 
 
 class RecipientInput(BaseModel):
-    recipient_name: Optional[str] = Field(default="", max_length=255, description="Full name of certificate recipient")
-    recipient_email: Optional[str] = Field(default=None, max_length=255, description="Email of recipient")
+    recipient_name: str | None = Field(default="", max_length=255, description="Full name of certificate recipient")
+    recipient_email: str | None = Field(default=None, max_length=255, description="Email of recipient")
 
 
 class RecipientResponse(BaseModel):
@@ -16,12 +17,12 @@ class RecipientResponse(BaseModel):
     job_id: str
     certificate_id: str
     recipient_name: str
-    recipient_email: Optional[str] = None
+    recipient_email: str | None = None
     status: RecipientStatus
-    error_message: Optional[str] = None
-    storage_key: Optional[str] = None
-    file_size_bytes: Optional[int] = None
+    error_message: str | None = None
+    storage_key: str | None = None
+    file_size_bytes: int | None = None
     retry_count: int
-    generated_at: Optional[datetime] = None
+    generated_at: datetime | None = None
     created_at: datetime
     updated_at: datetime

@@ -1,8 +1,7 @@
-import io
-from typing import Optional
-from app.storage.base import BaseStorage
-from app.core.config import settings
 import logging
+
+from app.core.config import settings
+from app.storage.base import BaseStorage
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +34,7 @@ class S3Storage(BaseStorage):
         )
         return key
 
-    def get_bytes(self, key: str) -> Optional[bytes]:
+    def get_bytes(self, key: str) -> bytes | None:
         if not self.s3_client or not self.bucket_name:
             raise RuntimeError("S3 client is not configured properly.")
         try:
@@ -62,5 +61,5 @@ class S3Storage(BaseStorage):
         except Exception:
             return False
 
-    def get_file_path(self, key: str) -> Optional[str]:
+    def get_file_path(self, key: str) -> str | None:
         return None

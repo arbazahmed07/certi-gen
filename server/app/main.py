@@ -1,12 +1,13 @@
-from fastapi import FastAPI, Request, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
-from app.core.config import settings
-from app.core.logging import setup_logging
-from app.core.errors import AppError
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 from app.api.v1.api import api_router
+from app.core.config import settings
+from app.core.errors import AppError
+from app.core.logging import setup_logging
 from app.db.base import Base
 from app.db.session import engine
 from app.storage import get_storage
@@ -22,7 +23,7 @@ async def lifespan(app: FastAPI):
         try:
             Base.metadata.create_all(bind=engine)
             break
-        except Exception as e:
+        except Exception:
             if attempt == 4:
                 raise
             time.sleep(2)

@@ -1,7 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from app.core.config import settings
 import logging
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +12,7 @@ def get_database_url() -> str:
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql+psycopg://", 1)
     elif url.startswith("postgresql://") and not (
-        url.startswith("postgresql+psycopg://") or url.startswith("postgresql+psycopg2://")
+        url.startswith(("postgresql+psycopg://", "postgresql+psycopg2://"))
     ):
         url = url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url

@@ -1,8 +1,7 @@
-from typing import List, Optional
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, field_validator
-import os
 from pathlib import Path
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -19,7 +18,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # CORS
-    ALLOWED_ORIGINS: List[str] = [
+    ALLOWED_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
@@ -35,8 +34,8 @@ class Settings(BaseSettings):
     
     # Celery & Redis
     REDIS_URL: str = "redis://localhost:6379/0"
-    CELERY_BROKER_URL: Optional[str] = None
-    CELERY_RESULT_BACKEND: Optional[str] = None
+    CELERY_BROKER_URL: str | None = None
+    CELERY_RESULT_BACKEND: str | None = None
     
     # Task processing configuration
     BATCH_SIZE: int = 50  # Bounded batch size for processing recipients
@@ -47,10 +46,10 @@ class Settings(BaseSettings):
     LOCAL_STORAGE_DIR: str = str(Path(__file__).resolve().parent.parent.parent / "storage_data")
     
     # S3 Settings (for production)
-    S3_BUCKET_NAME: Optional[str] = None
-    S3_ENDPOINT_URL: Optional[str] = None
-    S3_ACCESS_KEY_ID: Optional[str] = None
-    S3_SECRET_ACCESS_KEY: Optional[str] = None
+    S3_BUCKET_NAME: str | None = None
+    S3_ENDPOINT_URL: str | None = None
+    S3_ACCESS_KEY_ID: str | None = None
+    S3_SECRET_ACCESS_KEY: str | None = None
     S3_REGION_NAME: str = "us-east-1"
 
     # Certificate Defaults

@@ -1,15 +1,15 @@
 import csv
 import io
 import re
-from typing import List, Dict, Tuple, Any, Optional
+
 from app.schemas.recipient import RecipientInput
 
 
 class ValidationResult:
     def __init__(self):
-        self.valid_items: List[Dict[str, str]] = []
-        self.invalid_items: List[Dict[str, str]] = []
-        self.duplicates: List[Dict[str, str]] = []
+        self.valid_items: list[dict[str, str]] = []
+        self.invalid_items: list[dict[str, str]] = []
+        self.duplicates: list[dict[str, str]] = []
 
     @property
     def total_count(self) -> int:
@@ -22,7 +22,7 @@ class ValidationService:
     @classmethod
     def validate_recipients(
         cls,
-        recipients_data: List[RecipientInput],
+        recipients_data: list[RecipientInput],
         detect_duplicates: bool = True
     ) -> ValidationResult:
         result = ValidationResult()
@@ -56,9 +56,7 @@ class ValidationService:
             # 3. Duplicate detection
             is_dup = False
             if detect_duplicates:
-                if email and email in seen_emails:
-                    is_dup = True
-                elif not email and name.lower() in seen_names:
+                if email and email in seen_emails or not email and name.lower() in seen_names:
                     is_dup = True
 
             if is_dup:
@@ -88,7 +86,7 @@ class ValidationService:
         return result
 
     @classmethod
-    def parse_csv(cls, file_content: bytes) -> Tuple[List[RecipientInput], List[str]]:
+    def parse_csv(cls, file_content: bytes) -> tuple[list[RecipientInput], list[str]]:
         """
         Parses CSV with header detection for recipient_name/name, recipient_email/email.
         Returns parsed list and any format warnings/errors.
@@ -116,7 +114,7 @@ class ValidationService:
             if len(headers) > 1:
                 email_idx = 1
 
-        recipients: List[RecipientInput] = []
+        recipients: list[RecipientInput] = []
         errors = []
 
         for row_idx, row in enumerate(rows[1:], start=2):

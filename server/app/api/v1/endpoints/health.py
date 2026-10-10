@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
 from sqlalchemy import text
+from sqlalchemy.orm import Session
+
 from app.db.session import get_db
 
 router = APIRouter()
@@ -19,7 +20,7 @@ def readiness_check(db: Session = Depends(get_db)):
         db.execute(text("SELECT 1"))
         db_status = "connected"
     except Exception as exc:
-        db_status = f"unhealthy: {str(exc)}"
+        db_status = f"unhealthy: {exc!s}"
 
     return {
         "status": "ready" if db_status == "connected" else "degraded",

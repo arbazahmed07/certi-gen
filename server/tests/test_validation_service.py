@@ -1,5 +1,5 @@
-from app.services.validation_service import ValidationService
 from app.schemas.recipient import RecipientInput
+from app.services.validation_service import ValidationService
 
 
 def test_validation_clean_data():

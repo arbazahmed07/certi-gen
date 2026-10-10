@@ -1,19 +1,20 @@
 import io
+import logging
 import zipfile
-from typing import List, Tuple
+
 from sqlalchemy.orm import Session
+
+from app.models.job import ArchiveStatus
 from app.repositories.job_repository import JobRepository
 from app.repositories.recipient_repository import RecipientRepository
-from app.models.job import ArchiveStatus
 from app.storage import get_storage
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class ArchiveService:
     @classmethod
-    def create_job_zip_archive(cls, db: Session, job_id: str) -> Tuple[str, int]:
+    def create_job_zip_archive(cls, db: Session, job_id: str) -> tuple[str, int]:
         job_repo = JobRepository(db)
         recipient_repo = RecipientRepository(db)
         storage = get_storage()

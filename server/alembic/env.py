@@ -1,7 +1,9 @@
-from logging.config import fileConfig
 import sys
+from logging.config import fileConfig
 from pathlib import Path
+
 from sqlalchemy import engine_from_config, pool
+
 from alembic import context
 
 # Add parent directory to sys.path
@@ -9,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.db.base import Base
 from app.db.session import get_database_url
-from app.models import GenerationJob, RecipientCertificate
 
 config = context.config
 

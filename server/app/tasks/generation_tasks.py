@@ -1,13 +1,12 @@
 import logging
-from typing import Optional
-from app.tasks.celery_app import celery_app
+
 from app.db.session import SessionLocal
+from app.models.job import ArchiveStatus, JobStatus
 from app.repositories.job_repository import JobRepository
 from app.repositories.recipient_repository import RecipientRepository
-from app.models.job import JobStatus, ArchiveStatus
-from app.models.recipient import RecipientStatus
-from app.services.certificate_service import CertificateService
 from app.services.archive_service import ArchiveService
+from app.services.certificate_service import CertificateService
+from app.tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 

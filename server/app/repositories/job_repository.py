@@ -1,17 +1,18 @@
-from typing import Optional, List, Tuple
+
+from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, select, func
-from app.models.job import GenerationJob, JobStatus, ArchiveStatus, utcnow
+
+from app.models.job import ArchiveStatus, GenerationJob, JobStatus, utcnow
 
 
 class JobRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_id(self, job_id: str) -> Optional[GenerationJob]:
+    def get_by_id(self, job_id: str) -> GenerationJob | None:
         return self.db.query(GenerationJob).filter(GenerationJob.id == job_id).first()
 
-    def get_by_idempotency_key(self, idempotency_key: str) -> Optional[GenerationJob]:
+    def get_by_idempotency_key(self, idempotency_key: str) -> GenerationJob | None:
         if not idempotency_key:
             return None
         return self.db.query(GenerationJob).filter(GenerationJob.idempotency_key == idempotency_key).first()
@@ -24,11 +25,11 @@ class JobRepository:
 
     def list_jobs(
         self,
-        status: Optional[JobStatus] = None,
-        search: Optional[str] = None,
+        status: JobStatus | None = None,
+        search: str | None = None,
         offset: int = 0,
         limit: int = 20
-    ) -> Tuple[List[GenerationJob], int]:
+    ) -> tuple[list[GenerationJob], int]:
         query = self.db.query(GenerationJob)
 
         if status:
@@ -47,7 +48,7 @@ class JobRepository:
         jobs = query.order_by(desc(GenerationJob.created_at)).offset(offset).limit(limit).all()
         return jobs, total
 
-    def update_status(self, job_id: str, status: JobStatus, error_summary: Optional[str] = None) -> Optional[GenerationJob]:
+    def update_status(self, job_id: str, status: JobStatus, error_summary: str | None = None) -> GenerationJob | None:
         job = self.get_by_id(job_id)
         if not job:
             return None
@@ -67,9 +68,9 @@ class JobRepository:
         self,
         job_id: str,
         archive_status: ArchiveStatus,
-        storage_key: Optional[str] = None,
-        size_bytes: Optional[int] = None
-    ) -> Optional[GenerationJob]:
+        storage_key: str | None = None,
+        size_bytes: int | None = None
+    ) -> GenerationJob | None:
         job = self.get_by_id(job_id)
         if not job:
             return None
@@ -84,7 +85,7 @@ class JobRepository:
         self.db.refresh(job)
         return job
 
-    def recalculate_counts(self, job_id: str) -> Optional[GenerationJob]:
+    def recalculate_counts(self, job_id: str) -> GenerationJob | None:
         job = self.get_by_id(job_id)
         if not job:
             return None

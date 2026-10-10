@@ -1,9 +1,7 @@
 import io
-from datetime import datetime
-from typing import Optional
-from reportlab.lib.pagesizes import A4, landscape
+
 from reportlab.lib import colors
-from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 
 
@@ -24,7 +22,7 @@ class CertificateGenerator:
         issuer: str,
         organization: str,
         issue_date: str,
-        event_name: Optional[str] = None
+        event_name: str | None = None
     ) -> bytes:
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=landscape(A4))

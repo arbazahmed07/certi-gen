@@ -1,0 +1,9 @@
+﻿[lint]
+# Rules ignored across the entire project — these are deliberate patterns:
+#   B008  — FastAPI's Depends() in function signatures is idiomatic
+#   BLE001 — Broad Exception catches are intentional in service/storage/task layers
+#   G201  — logger.error(..., exc_info=True) is fine alongside logger.exception()
+#   S110  — try/except/pass in test cleanup is harmless
+#   ASYNC251 — time.sleep in a startup retry loop is intentional
+#   SIM102 — nested if for readability is acceptable
+ignore = ["B008", "BLE001", "G201", "S110", "ASYNC251", "SIM102"]

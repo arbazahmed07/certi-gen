@@ -1,15 +1,25 @@
 import enum
-from datetime import datetime, timezone
 import uuid
+from datetime import UTC, datetime
+
 from sqlalchemy import (
-    Column, String, Integer, DateTime, Text, Enum, ForeignKey, Index, BigInteger
+    BigInteger,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
+
 from app.db.base import Base
 
 
 def utcnow():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class RecipientStatus(str, enum.Enum):

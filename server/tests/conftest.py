@@ -1,16 +1,16 @@
-import pytest
-import os
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add server directory to sys.path
 SERVER_DIR = Path(__file__).resolve().parent.parent
 if str(SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(SERVER_DIR))
 
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi.testclient import TestClient
 
 # Use isolated sqlite database for tests
 TEST_DB_PATH = Path("./test_certiflow.db")
@@ -19,8 +19,8 @@ SQLALCHEMY_DATABASE_URL = f"sqlite:///{TEST_DB_PATH}"
 import app.db.session as db_session_module
 from app.db.base import Base
 from app.db.session import get_db
-from app.services.job_service import JobService
 from app.main import app
+from app.services.job_service import JobService
 
 test_engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -30,6 +30,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_
 # Patch SessionLocal across modules to use test db
 db_session_module.SessionLocal = TestingSessionLocal
 import app.tasks.generation_tasks as gen_tasks_module
+
 gen_tasks_module.SessionLocal = TestingSessionLocal
 
 

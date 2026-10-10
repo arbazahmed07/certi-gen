@@ -1,15 +1,15 @@
 import enum
-from datetime import datetime, timezone
 import uuid
-from sqlalchemy import (
-    Column, String, Integer, DateTime, Text, Enum, Index, BigInteger
-)
+from datetime import UTC, datetime
+
+from sqlalchemy import BigInteger, Column, DateTime, Enum, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
+
 from app.db.base import Base
 
 
 def utcnow():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class JobStatus(str, enum.Enum):

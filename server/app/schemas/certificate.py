@@ -1,6 +1,7 @@
-from typing import Optional
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
+
 from app.models.recipient import RecipientStatus
 
 
@@ -11,26 +12,26 @@ class CertificateResponse(BaseModel):
     job_id: str
     certificate_id: str
     recipient_name: str
-    recipient_email: Optional[str] = None
+    recipient_email: str | None = None
     course_name: str
     issuer: str
     organization: str
     issue_date: str
-    event_name: Optional[str] = None
+    event_name: str | None = None
     status: RecipientStatus
-    storage_key: Optional[str] = None
-    file_size_bytes: Optional[int] = None
-    generated_at: Optional[datetime] = None
-    download_url: Optional[str] = None
+    storage_key: str | None = None
+    file_size_bytes: int | None = None
+    generated_at: datetime | None = None
+    download_url: str | None = None
 
 
 class CertificateVerifyResponse(BaseModel):
     valid: bool
     certificate_id: str
-    recipient_name: Optional[str] = None
-    course_name: Optional[str] = None
-    issuer: Optional[str] = None
-    organization: Optional[str] = None
-    issue_date: Optional[str] = None
-    event_name: Optional[str] = None
-    generated_at: Optional[datetime] = None
+    recipient_name: str | None = None
+    course_name: str | None = None
+    issuer: str | None = None
+    organization: str | None = None
+    issue_date: str | None = None
+    event_name: str | None = None
+    generated_at: datetime | None = None

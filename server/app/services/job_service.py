@@ -1,16 +1,16 @@
-import threading
 import logging
-from typing import List, Optional, Tuple, Dict, Any
+import threading
+
 from sqlalchemy.orm import Session
-from app.models.job import GenerationJob, JobStatus, ArchiveStatus
+
+from app.core.errors import InvalidJobStateError, JobNotFoundError
+from app.models.job import ArchiveStatus, GenerationJob, JobStatus
 from app.models.recipient import RecipientCertificate, RecipientStatus
-from app.schemas.job import JobCreate, JobResponse, JobProgressResponse
-from app.schemas.recipient import RecipientInput
 from app.repositories.job_repository import JobRepository
 from app.repositories.recipient_repository import RecipientRepository
-from app.services.validation_service import ValidationService
+from app.schemas.job import JobCreate, JobProgressResponse
 from app.services.certificate_service import CertificateService
-from app.core.errors import JobNotFoundError, InvalidJobStateError
+from app.services.validation_service import ValidationService
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class JobService:
         )
         job = job_repo.create(job)
 
-        recipients_to_insert: List[RecipientCertificate] = []
+        recipients_to_insert: list[RecipientCertificate] = []
 
         # 1. Valid recipients
         for item in validation_result.valid_items:
@@ -134,10 +134,10 @@ class JobService:
         issuer: str,
         organization: str,
         issue_date: str,
-        event_name: Optional[str] = None,
-        idempotency_key: Optional[str] = None
+        event_name: str | None = None,
+        idempotency_key: str | None = None
     ) -> GenerationJob:
-        recipients, parse_errors = ValidationService.parse_csv(csv_bytes)
+        recipients, _parse_errors = ValidationService.parse_csv(csv_bytes)
         job_in = JobCreate(
             event_name=event_name,
             course_name=course_name,

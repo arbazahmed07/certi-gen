@@ -1,8 +1,8 @@
-import uuid
-from typing import Optional, Tuple
-from app.templates.certificate_pdf import CertificateGenerator
-from app.storage import get_storage
 import logging
+import uuid
+
+from app.storage import get_storage
+from app.templates.certificate_pdf import CertificateGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ class CertificateService:
         issuer: str,
         organization: str,
         issue_date: str,
-        event_name: Optional[str] = None
-    ) -> Tuple[str, int]:
+        event_name: str | None = None
+    ) -> tuple[str, int]:
         """
         Renders the PDF and commits it to the configured storage engine.
         Returns: (storage_key, file_size_bytes)
