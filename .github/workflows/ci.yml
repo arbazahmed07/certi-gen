@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -65,7 +65,7 @@ jobs:
         working-directory: server
 
     env:
-      DATABASE_URL: sqlite+aiosqlite:///./test_certiflow.db
+      DATABASE_URL: sqlite:///./test_certiflow.db
       REDIS_URL: redis://localhost:6379/0
       CELERY_BROKER_URL: redis://localhost:6379/0
       CELERY_RESULT_BACKEND: redis://localhost:6379/0
